@@ -13,7 +13,11 @@ object Main {
   /**
    * Exercise 1
    */
-    def pascal(c: Int, r: Int): Int = ???
+    def pascal(c: Int, r: Int): Int =
+  if (c == 0 || c == r) 1 else {
+    val upperR = r - 1
+    pascal(c - 1, upperR) + pascal(c, upperR)
+  }
   
   /**
    * Exercise 2
