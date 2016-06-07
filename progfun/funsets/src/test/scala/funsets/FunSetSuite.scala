@@ -110,5 +110,25 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("intersect") {
+    new TestSets {
+      val s123 = union(union(s1, s2), s3)
+      val s = intersect(s123, s2)
+      assert(!contains(s, 1), "Union 1")
+      assert(contains(s, 2), "Union 2")
+      assert(!contains(s, 3), "Union 3")
+    }
+  }
+
+  test("diff") {
+    new TestSets {
+      val s123 = union(union(s1, s2), s3)
+      val s = diff(s123, s2)
+      assert(contains(s, 1), "Union 1")
+      assert(!contains(s, 2), "Union 2")
+      assert(contains(s, 3), "Union 3")
+    }
+  }
+
 
 }
