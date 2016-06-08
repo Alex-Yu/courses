@@ -140,5 +140,17 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("forall") {
+    new TestSets {
+      val minS = singletonSet(-1000)
+      val maxS = singletonSet(1000)
+      val s5 = union(union(union(union(s1, s2), s3), minS), maxS)
+      val pred1 = (x: Int) => x >= -1000
+      val pred2 = (x: Int) => x < 1000
+      assert(forall(s5, pred1), "Pred 1")
+      assert(!forall(s5, pred2), "Pred 2")
+    }
+  }
+
 
 }
