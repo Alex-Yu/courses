@@ -152,17 +152,32 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("exists") {
+    new TestSets {
+      val emptySet: Set = _ => false
+      val minS = singletonSet(-1000)
+      val maxS = singletonSet(1000)
+      val s5 = union(union(union(union(s1, s2), s3), minS), maxS)
+      val pred1 = (x: Int) => x >= -1000
+      val pred2 = (x: Int) => x == 100
+      assert(!exists(emptySet, pred1), "empty set")
+      assert(exists(s5, pred1), "Pred 1")
+      assert(!exists(s5, pred2), "Pred 2")
+    }
+  }
+
   test("map") {
     new TestSets {
       val minS = singletonSet(-100)
       val maxS = singletonSet(100)
       val s5 = union(union(union(union(s1, s2), s3), minS), maxS)
       val fun = (x: Int) => x + 5
-      assert(contains(map(s5, fun), 6), "map 6")
-      assert(contains(map(s5, fun), 7), "map 7")
-      assert(contains(map(s5, fun), -95), "map -95")
-      assert(contains(map(s5, fun), 95), "map 95")
-      assert(!contains(map(s5, fun), 96), "map 96")
+      val res = map(s5, fun)
+      assert(contains(res, 6), "map 6")
+      assert(contains(res, 7), "map 7")
+      assert(contains(res, -95), "map -95")
+      assert(!contains(res, 95), "map 95")
+      assert(!contains(res, 96), "map 96")
     }
   }
 
