@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1b4233b8-9eaa-423b-889d-439e8d44a80a" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/project/target/streams/compile/copyResources/$global/streams/copy-resources" afterPath="$PROJECT_DIR$/project/target/streams/compile/copyResources/$global/streams/copy-resources" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/project/target/streams/$global/dependencyPositions/$global/streams/update_cache_2.10/output_dsp" afterPath="$PROJECT_DIR$/project/target/streams/$global/dependencyPositions/$global/streams/update_cache_2.10/output_dsp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/patmat/Huffman.scala" afterPath="$PROJECT_DIR$/src/main/scala/patmat/Huffman.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
@@ -30,8 +32,8 @@
       <file leaf-file-name="Huffman.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/patmat/Huffman.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.53807104">
-              <caret line="142" column="4" selection-start-line="142" selection-start-column="4" selection-end-line="142" selection-end-column="4" />
+            <state vertical-scroll-proportion="0.6345178">
+              <caret line="216" column="0" selection-start-line="216" selection-start-column="0" selection-end-line="216" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -470,7 +472,13 @@
       <option name="project" value="LOCAL" />
       <updated>1466541918352</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="implement until and createCodeTree">
+      <created>1466544024103</created>
+      <option name="number" value="00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1466544024103</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -511,7 +519,8 @@
     <MESSAGE value="implement makeOrderedLeafList" />
     <MESSAGE value="implement singleton" />
     <MESSAGE value="implement combine" />
-    <option name="LAST_COMMIT_MESSAGE" value="implement combine" />
+    <MESSAGE value="implement until and createCodeTree" />
+    <option name="LAST_COMMIT_MESSAGE" value="implement until and createCodeTree" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -536,8 +545,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/patmat/Huffman.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.53807104">
-          <caret line="142" column="4" selection-start-line="142" selection-start-column="4" selection-end-line="142" selection-end-column="4" />
+        <state vertical-scroll-proportion="0.6345178">
+          <caret line="216" column="0" selection-start-line="216" selection-start-column="0" selection-end-line="216" selection-end-column="0" />
           <folding />
         </state>
       </provider>
