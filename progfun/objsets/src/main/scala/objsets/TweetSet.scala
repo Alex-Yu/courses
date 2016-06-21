@@ -162,8 +162,7 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
     * and be implemented in the subclasses?
     */
   override def union(that: TweetSet): TweetSet =
-    ((left union right) union that) incl elem
-
+    left union (right union that.incl(elem))
 
   /**
     * Returns the tweet from this set which has the greatest retweet count.
@@ -241,17 +240,20 @@ object GoogleVsApple {
   val google = List("android", "Android", "galaxy", "Galaxy", "nexus", "Nexus")
   val apple = List("ios", "iOS", "iphone", "iPhone", "ipad", "iPad")
 
-  lazy val googleTweets: TweetSet = ???
-  lazy val appleTweets: TweetSet = ???
+  private def getFiltered(list: List[String]) = TweetReader.allTweets.filter(tweet => list.exists(tweet.text.contains))
+
+  lazy val googleTweets: TweetSet = getFiltered(google)
+  lazy val appleTweets: TweetSet = getFiltered(apple)
 
   /**
     * A list of all tweets mentioning a keyword from either apple or google,
     * sorted by the number of retweets.
     */
-  lazy val trending: TweetList = ???
+  lazy val trending: TweetList = (googleTweets union appleTweets) descendingByRetweet
 }
 
 object Main extends App {
+
   // Print the trending tweets
-  GoogleVsApple.trending foreach println
+    GoogleVsApple.trending foreach println
 }
