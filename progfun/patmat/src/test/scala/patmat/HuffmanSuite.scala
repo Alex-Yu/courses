@@ -44,6 +44,19 @@ class HuffmanSuite extends FunSuite {
     assert(combine(leaflist) === List(Fork(Leaf('e',1),Leaf('t',2),List('e', 't'),3), Leaf('x',4)))
   }
 
+  test("encode") {
+    new TestTrees {
+      assert(encode(t1)("ab".toList) === List(0, 1))
+      assert(encode(t2)("bad".toList) === List(0, 1, 0, 0, 1))
+    }
+  }
+
+  test("decode") {
+    new TestTrees {
+      assert(decode(t1, List(0, 1)) === "ab".toList)
+      assert(decode(t2, List(0, 1, 0, 0, 1)) === "bad".toList)
+    }
+  }
 
   test("decode and encode a very short text should be identity") {
     new TestTrees {
