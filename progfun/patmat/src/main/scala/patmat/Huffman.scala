@@ -2,6 +2,8 @@ package patmat
 
 import common._
 
+import scala.annotation.tailrec
+
 /**
   * Assignment 4: Huffman coding
   *
@@ -132,6 +134,7 @@ object Huffman {
     *    the example invocation. Also define the return type of the `until` function.
     *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
     */
+  @tailrec
   def until(isFinish: List[CodeTree] => Boolean,
             repeat: List[CodeTree] => List[CodeTree])(z: List[CodeTree]): List[CodeTree] = {
     require(z.nonEmpty, "List of CodeTrees couldn't be empty")
@@ -161,6 +164,7 @@ object Huffman {
     */
   def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
     val errMsg = "Incorrect bits value"
+    @tailrec
     def loop(z: List[Char], subtree: CodeTree, bitz: List[Bit]): List[Char] =
       bitz match {
         case Nil =>
@@ -212,6 +216,7 @@ object Huffman {
   def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
     val errMsg = "Incorrect CodeTree"
 
+    @tailrec
     def loop(z: List[Bit], subTree: CodeTree, subText: List[Char]): List[Bit] =
       if (subText.isEmpty) z else {
         val soughtFor = subText.head
@@ -234,7 +239,12 @@ object Huffman {
     * This function returns the bit sequence that represents the character `char` in
     * the code table `table`.
     */
-  def codeBits(table: CodeTable)(char: Char): List[Bit] = ???
+  @tailrec
+  def codeBits(table: CodeTable)(char: Char): List[Bit] = table match {
+    case Nil => List.empty[Bit]
+    case h :: _ if h._1 == char => h._2
+    case _ :: t => codeBits(t)(char)
+  }
 
   /**
     * Given a code tree, create a code table which contains, for every character in the
