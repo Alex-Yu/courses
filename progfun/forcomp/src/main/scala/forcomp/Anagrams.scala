@@ -59,7 +59,8 @@ object Anagrams {
     *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
     *
     */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictionary groupBy wordOccurrences
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] =
+    dictionary groupBy wordOccurrences withDefaultValue List.empty[Word]
 
   /** Returns all the anagrams of a given word. */
   def wordAnagrams(word: Word): List[Word] = (dictionaryByOccurrences compose wordOccurrences)(word)
@@ -115,7 +116,8 @@ object Anagrams {
     (z, el) =>
       val (ch, freq) = el
       val minuend = z(ch)
-      if (minuend <= freq) z - ch else z.updated(ch, minuend - freq)
+      require(minuend >= freq, "y occurrence is greater than x")
+      if (minuend == freq) z - ch else z.updated(ch, minuend - freq)
   }.toList.sortBy(_._1)
 
 
@@ -159,5 +161,13 @@ object Anagrams {
     *
     *  Note: There is only one anagram of an empty sentence.
     */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ??? /*combinations(sentenceOccurrences(sentence))*/
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+    val so: Occurrences = sentenceOccurrences(sentence)
+    val combis: List[Occurrences] = combinations(so)
+  }
+
+
+
+
+   /*combinations(sentenceOccurrences(sentence))*/
 }
