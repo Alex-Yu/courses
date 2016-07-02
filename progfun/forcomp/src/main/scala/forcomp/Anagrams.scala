@@ -42,7 +42,8 @@ object Anagrams {
       .sortBy(_._1)
 
   /** Converts a sentence into its character occurrence list. */
-  def sentenceOccurrences(s: Sentence): Occurrences = wordOccurrences(s.mkString(""))
+  def sentenceOccurrences(s: Sentence): Occurrences =
+    if (s.isEmpty) List.empty[(Char, Int)] else wordOccurrences(s.mkString(""))
 
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
     *  the words that have that occurrence count.
@@ -162,12 +163,17 @@ object Anagrams {
     *  Note: There is only one anagram of an empty sentence.
     */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-    val so: Occurrences = sentenceOccurrences(sentence)
-    val combis: List[Occurrences] = combinations(so)
+    def loop(occurence: Occurrences): List[Sentence] = {
+      if (occurence.isEmpty) List(List.empty[Word])
+      else
+        for {
+          comby <- combinations(occurence) if dictionaryByOccurrences(comby).nonEmpty
+          word <- dictionaryByOccurrences(comby)
+          rest <- loop(subtract(occurence, comby))
+        } yield word :: rest
+    }
+
+    loop(sentenceOccurrences(sentence))
   }
 
-
-
-
-   /*combinations(sentenceOccurrences(sentence))*/
 }
