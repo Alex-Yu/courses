@@ -163,13 +163,13 @@ object Anagrams {
     *  Note: There is only one anagram of an empty sentence.
     */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-    def loop(occurence: Occurrences): List[Sentence] = {
-      if (occurence.isEmpty) List(List.empty[Word])
+    def loop(occurrence: Occurrences): List[Sentence] = {
+      if (occurrence.isEmpty) List(List.empty[Word])
       else
         for {
-          comby <- combinations(occurence) if dictionaryByOccurrences(comby).nonEmpty
+          comby <- combinations(occurrence) if dictionaryByOccurrences(comby).nonEmpty
           word <- dictionaryByOccurrences(comby)
-          rest <- loop(subtract(occurence, comby))
+          rest <- loop(subtract(occurrence, comby))
         } yield word :: rest
     }
 
