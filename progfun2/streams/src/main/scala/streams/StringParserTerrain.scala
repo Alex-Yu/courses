@@ -56,7 +56,7 @@ trait StringParserTerrain extends GameDef {
     pos =>
       val x = pos.x
       val y = pos.y
-      require(x < levelVector.size && y < levelVector(x).size)
+      require(x < levelVector.size && y < levelVector(x).size, "Position out of bounds")
       levelVector(x)(y) != 'o'
   }
 
@@ -68,7 +68,16 @@ trait StringParserTerrain extends GameDef {
    * Hint: you can use the functions `indexWhere` and / or `indexOf` of the
    * `Vector` class
    */
-  def findChar(c: Char, levelVector: Vector[Vector[Char]]): Pos = ???
+  def findChar(c: Char, levelVector: Vector[Vector[Char]]): Pos = {
+    var x = -1
+    val y = levelVector.indexWhere {
+      inner =>
+        x = inner.indexWhere(_ == c)
+        x != -1
+    }
+    require(x > -1, "Char not found")
+    Pos(x, y)
+  }
 
   private lazy val vector: Vector[Vector[Char]] =
     Vector(level.split("\n").map(str => Vector(str: _*)): _*)
