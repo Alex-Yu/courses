@@ -56,8 +56,7 @@ trait StringParserTerrain extends GameDef {
     pos =>
       val x = pos.x
       val y = pos.y
-      require(x < levelVector.size && y < levelVector(x).size, "Position out of bounds")
-      levelVector(x)(y) != 'o'
+      x < levelVector.size && x >= 0 && y < levelVector(x).size && y >= 0 && levelVector(x)(y) != '-'
   }
 
   /**
