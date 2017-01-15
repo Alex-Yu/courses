@@ -81,7 +81,7 @@ trait GameDef {
     * This function returns the block at the start position of
     * the game.
     */
-  def startBlock: Block = Block(startPos, Pos(startPos.row, startPos.col + 1))
+  def startBlock: Block = Block(startPos, startPos)
 
 
   /**

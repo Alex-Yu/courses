@@ -102,7 +102,6 @@ class BloxorzSuite extends FunSuite {
     }
   }
 
-
   test("optimal solution length for level 1") {
     new Level1 {
       assert(solution.length == optsolution.length)
