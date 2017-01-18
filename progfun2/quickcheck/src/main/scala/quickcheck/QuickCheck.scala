@@ -50,18 +50,16 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
   property("proper_order_for_all") = forAll { (h: H) =>
     @tailrec
     def isProperOrder(ht: H, e: A): Boolean =
-      if (isEmpty(ht)) true
-      else {
+      isEmpty(ht) || {
         val htMin = findMin(ht)
-        if (e <= htMin) isProperOrder(deleteMin(ht), htMin) else false
+        e <= htMin && isProperOrder(deleteMin(ht), htMin)
       }
 
-    if (isEmpty(h)) true else isProperOrder(deleteMin(h), findMin(h))
+    isEmpty(h) || isProperOrder(deleteMin(h), findMin(h))
   }
 
   property("melding") = forAll { (h1: H, h2: H) =>
-    if (isEmpty(h1) && isEmpty(h2)) true
-    else {
+    (isEmpty(h1) && isEmpty(h2)) || {
       val meldMin = findMin(meld(h1, h2))
       if (isEmpty(h1)) meldMin == findMin(h2)
       else if (isEmpty(h2)) meldMin == findMin(h1)
