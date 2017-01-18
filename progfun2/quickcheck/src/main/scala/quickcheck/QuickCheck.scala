@@ -47,18 +47,22 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
     isEmpty(deleteMin(insert(e, empty)))
   }
 
-  property("proper_order_for_all") = forAll { (h: H) =>
+  def isProperOrder(h: H) = {
     @tailrec
-    def isProperOrder(ht: H, e: A): Boolean =
+    def isProperOrderLoop(ht: H, e: A): Boolean =
       isEmpty(ht) || {
         val htMin = findMin(ht)
-        e <= htMin && isProperOrder(deleteMin(ht), htMin)
+        e <= htMin && isProperOrderLoop(deleteMin(ht), htMin)
       }
 
-    isEmpty(h) || isProperOrder(deleteMin(h), findMin(h))
+    isEmpty(h) || isProperOrderLoop(deleteMin(h), findMin(h))
   }
 
-  property("melding") = forAll { (h1: H, h2: H) =>
+  property("proper_order_for_all") = forAll { (h: H) =>
+    isProperOrder(h)
+  }
+
+  property("melding1") = forAll { (h1: H, h2: H) =>
     (isEmpty(h1) && isEmpty(h2)) || {
       val meldMin = findMin(meld(h1, h2))
       if (isEmpty(h1)) meldMin == findMin(h2)
@@ -66,6 +70,29 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
       else meldMin == findMin(h1) || meldMin == findMin(h2)
     }
   }
+
+  property("melding2") = forAll { (h1: H, h2: H) =>
+    isProperOrder(meld(h1, h2))
+  }
+
+  property("flow") = forAll { h: H =>
+    def toList(h: H): List[Int] = {
+      def loop(ht: H, z: List[A]): List[A] = if (isEmpty(ht)) z else loop(deleteMin(ht), findMin(ht) :: z)
+      loop(h, List.empty).reverse
+    }
+
+    def toHeap(l: List[A]): H = l.foldLeft(empty)((z, e) => insert(e, z))
+
+    val l = toList(h)
+    val h2 = toHeap(l)
+
+    def isEqual(h1: H, h2: H): Boolean =
+      (isEmpty(h1) && isEmpty(h2)) || (findMin(h1) == findMin(h2) && isEqual(deleteMin(h1), deleteMin(h2)))
+
+    isEqual(h, h2)
+  }
+
+
 
 
 
