@@ -76,6 +76,7 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
   }
 
   property("flow") = forAll { h: H =>
+    @tailrec
     def toList(h: H): List[Int] = {
       def loop(ht: H, z: List[A]): List[A] = if (isEmpty(ht)) z else loop(deleteMin(ht), findMin(ht) :: z)
       loop(h, List.empty).reverse
@@ -86,6 +87,7 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
     val l = toList(h)
     val h2 = toHeap(l)
 
+    @tailrec
     def isEqual(h1: H, h2: H): Boolean =
       (isEmpty(h1) && isEmpty(h2)) || (findMin(h1) == findMin(h2) && isEqual(deleteMin(h1), deleteMin(h2)))
 
