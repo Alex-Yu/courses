@@ -28,6 +28,16 @@ class CalculatorSuite extends FunSuite with ShouldMatchers {
     assert(result2() == MaxTweetLength - tweetLength(tooLong))
   }
 
+  test("tweetRemainingCharsCount with a dynamic signal") {
+    val in = Var("hello")
+    val result = TweetLength.tweetRemainingCharsCount(in)
+    assert(result() == MaxTweetLength - tweetLength("hello"))
+
+    in() = "hello world"
+    val result2 = TweetLength.tweetRemainingCharsCount(in)
+    assert(result2() == MaxTweetLength - tweetLength("hello world"))
+  }
+
   test("tweetRemainingCharsCount with a supplementary char") {
     val result = TweetLength.tweetRemainingCharsCount(Var("foo blabla \uD83D\uDCA9 bar"))
     assert(result() == MaxTweetLength - tweetLength("foo blabla \uD83D\uDCA9 bar"))
