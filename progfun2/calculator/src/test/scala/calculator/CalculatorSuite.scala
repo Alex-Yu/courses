@@ -6,18 +6,18 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import org.scalatest._
-
 import TweetLength.MaxTweetLength
+import Calculator._
 
 @RunWith(classOf[JUnitRunner])
 class CalculatorSuite extends FunSuite with ShouldMatchers {
 
   /******************
-   ** TWEET LENGTH **
-   ******************/
+    ** TWEET LENGTH **
+    ******************/
 
   def tweetLength(text: String): Int =
-    text.codePointCount(0, text.length)
+  text.codePointCount(0, text.length)
 
   test("tweetRemainingCharsCount with a constant signal") {
     val result = TweetLength.tweetRemainingCharsCount(Var("hello world"))
@@ -59,6 +59,23 @@ class CalculatorSuite extends FunSuite with ShouldMatchers {
     assert(resultRed1() == "red")
     val resultRed2 = TweetLength.colorForRemainingCharsCount(Var(-5))
     assert(resultRed2() == "red")
+  }
+
+  test("compute values") {
+    val a: Var[Expr] = Var(Literal(10d))
+    val b: Var[Expr] = Var(Ref("a"))
+    val c: Var[Expr] = Var(Plus(Literal(5d), Ref("b")))
+
+    val all: Map[String, Signal[Expr]] = Map(
+      "a" -> a.asInstanceOf[Signal[Expr]],
+      "b" -> b.asInstanceOf[Signal[Expr]],
+      "c" -> c.asInstanceOf[Signal[Expr]]
+    )
+
+    val result1 = computeValues(all)
+    assert(result1("a")() == 10d)
+    assert(result1("b")() == 10d)
+    assert(result1("c")() == 15d)
   }
 
 }
