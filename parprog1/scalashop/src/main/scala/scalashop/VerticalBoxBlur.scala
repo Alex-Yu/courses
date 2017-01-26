@@ -37,29 +37,37 @@ object VerticalBoxBlurRunner {
 object VerticalBoxBlur {
 
   /** Blurs the columns of the source image `src` into the destination image
-   *  `dst`, starting with `from` and ending with `end` (non-inclusive).
-   *
-   *  Within each column, `blur` traverses the pixels by going from top to
-   *  bottom.
-   */
+    *  `dst`, starting with `from` and ending with `end` (non-inclusive).
+    *
+    *  Within each column, `blur` traverses the pixels by going from top to
+    *  bottom.
+    */
   def blur(src: Img, dst: Img, from: Int, end: Int, radius: Int): Unit =
-    for {
-      x <- from until end
-      y <- 0 until src.height
-    } {
-      dst(x, y) = boxBlurKernel(src, x, y, radius)
-    }
+  for {
+    x <- from until end
+    y <- 0 until src.height
+  } {
+    dst(x, y) = boxBlurKernel(src, x, y, radius)
+  }
 
 
   /** Blurs the columns of the source image in parallel using `numTasks` tasks.
-   *
-   *  Parallelization is done by stripping the source image `src` into
-   *  `numTasks` separate strips, where each strip is composed of some number of
-   *  columns.
-   */
+    *
+    *  Parallelization is done by stripping the source image `src` into
+    *  `numTasks` separate strips, where each strip is composed of some number of
+    *  columns.
+    */
   def parBlur(src: Img, dst: Img, numTasks: Int, radius: Int): Unit = {
-    // TODO implement using the `task` construct and the `blur` method
-    ???
+    val width = src.width
+    val step = Math.max(width / numTasks, 1)
+    (0 until width by step).map { x =>
+      val maybeEnd = x + step
+      val end = if (maybeEnd > width) width else maybeEnd
+      task {
+        blur(src, dst, x, end, radius)
+      }
+    }.foreach(_.join())
   }
+
 
 }
