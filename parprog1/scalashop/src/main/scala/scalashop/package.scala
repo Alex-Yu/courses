@@ -58,7 +58,21 @@ package object scalashop {
       dx = -radius
     }
 
-    xyClamped.map(p => src(p._1, p._2)).sum / xyClamped.size
+
+    val t = xyClamped.map { p =>
+      val rgba = src(p._1, p._2)
+      (red(rgba), green(rgba), blue(rgba), alpha(rgba))
+    }.foldLeft((0, 0, 0, 0)) {
+      (z, e) => (z._1 + e._1, z._2 + e._2, z._3 + e._3, z._4 + e._4)
+    }
+
+    val s = xyClamped.size
+    rgba(
+      t._1 / s,
+      t._2 / s,
+      t._3 / s,
+      t._4 / s
+    )
   }
 
 }
