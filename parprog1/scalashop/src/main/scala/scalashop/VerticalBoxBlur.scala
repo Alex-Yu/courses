@@ -42,10 +42,14 @@ object VerticalBoxBlur {
    *  Within each column, `blur` traverses the pixels by going from top to
    *  bottom.
    */
-  def blur(src: Img, dst: Img, from: Int, end: Int, radius: Int): Unit = {
-    // TODO implement this method using the `boxBlurKernel` method
-    ???
-  }
+  def blur(src: Img, dst: Img, from: Int, end: Int, radius: Int): Unit =
+    for {
+      x <- from until end
+      y <- 0 until src.height
+    } {
+      dst(x, y) = boxBlurKernel(src, x, y, radius)
+    }
+
 
   /** Blurs the columns of the source image in parallel using `numTasks` tasks.
    *
