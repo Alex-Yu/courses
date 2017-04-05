@@ -1,8 +1,8 @@
 package reductions
 
-import scala.annotation._
 import org.scalameter._
 import common._
+import scala.annotation._
 
 object ParallelParenthesesBalancingRunner {
 
@@ -39,24 +39,51 @@ object ParallelParenthesesBalancingRunner {
 object ParallelParenthesesBalancing {
 
   /** Returns `true` iff the parentheses in the input `chars` are balanced.
-   */
+    */
   def balance(chars: Array[Char]): Boolean = {
-    ???
+    @tailrec
+    def loop(chars: Array[Char], acc: Int): Boolean = {
+      if (acc < 0) false else
+      if (chars.isEmpty) acc == 0 else {
+        val h = chars.head
+        val t = chars.tail
+        val nextAcc = if (h == '(') acc + 1 else if (h == ')') acc - 1 else acc
+        loop(t, nextAcc)
+      }
+    }
+
+    loop(chars, 0)
   }
 
   /** Returns `true` iff the parentheses in the input `chars` are balanced.
-   */
+    */
   def parBalance(chars: Array[Char], threshold: Int): Boolean = {
 
-    def traverse(idx: Int, until: Int, arg1: Int, arg2: Int) /*: ???*/ = {
-      ???
+    @tailrec
+    def traverse(idx: Int, until: Int, arg1: Int, arg2: Int): (Int, Int) = {
+      if (idx >= until) (arg1, arg2)
+      else {
+        val ch = chars(idx)
+        if (ch == '(') traverse(idx + 1, until, arg1 + 1, arg2)
+        else if (ch == ')') {
+          val arg1Dec = arg1 - 1
+          traverse(idx + 1, until, arg1Dec, Math.min(arg1Dec, arg2))
+        }
+        else traverse(idx + 1, until, arg1, arg2)
+      }
     }
 
-    def reduce(from: Int, until: Int) /*: ???*/ = {
-      ???
+    def reduce(from: Int, until: Int): (Int, Int) = {
+      if (threshold <= until - from) traverse(from, until, 0, 0)
+      else {
+        val mid = from + (until - from) / 2
+        val ((acc1, min1), (acc2, min2)) = parallel(reduce(from, mid), reduce(mid, until))
+        (acc1 + acc2, Math.min(min1, acc1 + min2))
+      }
     }
 
-    reduce(0, chars.length) == ???
+    val (acc, min) = reduce(0, chars.length)
+    acc == 0 && min >= 0
   }
 
   // For those who want more:
