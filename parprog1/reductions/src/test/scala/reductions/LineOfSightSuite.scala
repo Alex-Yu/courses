@@ -30,5 +30,17 @@ class LineOfSightSuite extends FunSuite {
     assert(output.toList == List(0f, 1f, 4f, 4f))
   }
 
+  test("parLineOfSight should correctly handle an array of size 4") {
+    val output = new Array[Float](4)
+    parLineOfSight(Array[Float](0f, 1f, 8f, 9f), output, 1)
+    assert(output.toList == List(0f, 1f, 4f, 4f))
+  }
+
+  test("parLineOfSight should correctly handle an array of size 8") {
+    val output = new Array[Float](8)
+    parLineOfSight(Array[Float](0f, 1f, 8f, 9f, 5f, 7f, 30f, 42f), output, 4)
+    assert(output.toList == List(0f, 1f, 4f, 4f, 4f, 4f, 5f, 6f))
+  }
+
 }
 

@@ -58,7 +58,6 @@ object ParallelParenthesesBalancing {
   /** Returns `true` iff the parentheses in the input `chars` are balanced.
     */
   def parBalance(chars: Array[Char], threshold: Int): Boolean = {
-
     @tailrec
     def traverse(idx: Int, until: Int, arg1: Int, arg2: Int): (Int, Int) = {
       if (idx >= until) (arg1, arg2)
@@ -74,7 +73,7 @@ object ParallelParenthesesBalancing {
     }
 
     def reduce(from: Int, until: Int): (Int, Int) = {
-      if (threshold <= until - from) traverse(from, until, 0, 0)
+      if (until - from <= threshold) traverse(from, until, 0, 0)
       else {
         val mid = from + (until - from) / 2
         val ((acc1, min1), (acc2, min2)) = parallel(reduce(from, mid), reduce(mid, until))
