@@ -1,7 +1,7 @@
 package kmeans
 
 import scala.annotation.tailrec
-import scala.collection._
+import scala.collection.{GenSeq, _}
 import scala.util.Random
 import org.scalameter._
 import common._
@@ -43,7 +43,12 @@ class KMeans {
   }
 
   def classify(points: GenSeq[Point], means: GenSeq[Point]): GenMap[Point, GenSeq[Point]] = {
-    ???
+    val r = points.groupBy(findClosest(_, means))
+    val emptyMeans = means.collect {
+      case m if r.get(m).isEmpty => m -> GenSeq.empty[Point]
+    }
+
+    r ++ emptyMeans
   }
 
   def findAverage(oldMean: Point, points: GenSeq[Point]): Point = if (points.length == 0) oldMean else {
@@ -59,11 +64,13 @@ class KMeans {
   }
 
   def update(classified: GenMap[Point, GenSeq[Point]], oldMeans: GenSeq[Point]): GenSeq[Point] = {
-    ???
+    oldMeans.map ( m =>
+      findAverage(m, classified(m))
+    )
   }
 
   def converged(eta: Double)(oldMeans: GenSeq[Point], newMeans: GenSeq[Point]): Boolean = {
-    ???
+    oldMeans.corresponds(newMeans)((o, n) => o.squareDistance(n) <= eta)
   }
 
   @tailrec

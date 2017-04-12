@@ -71,6 +71,25 @@ class KMeansSuite extends FunSuite {
     checkParClassify(points, means, expected)
   }
 
+  test("`converged` should return true for means that is in eta-limits") {
+    val eta = 1.0
+    val p1 = new Point(1, 1, 0)
+    val p2 = new Point(1, -1, 0)
+    val p3 = new Point(-1, 1, 0)
+    val p4 = new Point(-1, -1, 0)
+    val oms = GenSeq(p1, p2, p3, p4)
+    val nmsIdent = GenSeq(p1, p2, p3, p4)
+    assert(converged(eta)(oms, nmsIdent), "converged should return true for identical sequences")
+
+    val p5 = new Point(-1, -1.5, 0)
+    val nmsNear = GenSeq(p1, p2, p3, p5)
+    assert(converged(eta)(oms, nmsNear), "converged should return true for near-eta sequences")
+
+    val p6 = new Point(-100, -1.5, 0)
+    val nmsFar = GenSeq(p1, p2, p3, p6)
+    assert(!converged(eta)(oms, nmsFar), "converged should return false for far-eta sequences")
+  }
+
 }
 
 
