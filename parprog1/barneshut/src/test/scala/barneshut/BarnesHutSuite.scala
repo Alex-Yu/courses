@@ -97,6 +97,24 @@ import FloatOps._
     assert(body.yspeed ~= 0.015557117f)
   }
 
+  //from forum
+  test("Big leaf should become a fork after insert") {
+    val b1 = new Body(123f, 18f, 26f, 0f, 0f)
+    val b2 = new Body(123f, 20f, 20f, 0f, 0f)
+    val quad = Leaf(19f, 23f, 100f, Seq(b1))
+
+    val newQuad = quad.insert(b2)
+
+    newQuad match {
+      case Fork(_, _, _, _) =>
+        assert(newQuad.mass ~= 246f, s"${newQuad.mass} should be 246f")
+        assert(newQuad.size ~= 100f, s"${newQuad.size} should be 100f")
+        assert(newQuad.centerX ~= 19f, s"${newQuad.size} should be 19f")
+      case _ =>
+        fail("Inserting to a big Leaf should have returned a Fork")
+    }
+  }
+
   // test cases for sector matrix
 
   test("'SectorMatrix.+=' should add a body at (25,47) to the correct bucket of a sector matrix of size 96") {

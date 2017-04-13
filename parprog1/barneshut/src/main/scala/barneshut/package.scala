@@ -67,8 +67,8 @@ package object barneshut {
     val centerY: Float = nw.centerY + nw.size / 2
     val size: Float = nw.size * 2
     val mass: Float = nw.mass + ne.mass + sw. mass + se.mass
-    val massX: Float = if (isEmpty) centerX else nw.mass * nw.massX + ne.mass * ne.massX + sw.mass * sw.massX + se.mass * se.massX
-    val massY: Float = if (isEmpty) centerX else nw.mass * nw.massY + ne.mass * ne.massY + sw.mass * sw.massY + se.mass * se.massY
+    val massX: Float = if (isEmpty) centerX else (nw.mass * nw.massX + ne.mass * ne.massX + sw.mass * sw.massX + se.mass * se.massX) / mass
+    val massY: Float = if (isEmpty) centerY else (nw.mass * nw.massY + ne.mass * ne.massY + sw.mass * sw.massY + se.mass * se.massY) / mass
     val total: Int = nw.total + ne.total + sw.total + se.total
 
     def insert(b: Body): Fork = {
@@ -90,9 +90,30 @@ package object barneshut {
 
   case class Leaf(centerX: Float, centerY: Float, size: Float, bodies: Seq[Body])
     extends Quad {
-    val (mass, massX, massY) = (??? : Float, ??? : Float, ??? : Float)
-    val total: Int = ???
-    def insert(b: Body): Quad = ???
+    /*val (mass: Float, massX, massY) = (
+      bodies.foldLeft(0f)(_ + _.mass): Float,
+      bodies.foldLeft(0f)((z, b) => z + b.x * b.mass) / mass: Float,
+      bodies.foldLeft(0f)((z, b) => z + b.y * b.mass) / mass: Float)*/
+    val mass: Float = bodies.foldLeft(0f)(_ + _.mass)
+    val massX: Float = bodies.foldLeft(0f)((z, b) => z + b.x * b.mass) / mass
+    val massY: Float = bodies.foldLeft(0f)((z, b) => z + b.y * b.mass) / mass
+
+    val total: Int = bodies.length
+
+    def insert(b: Body): Quad = {
+      val allBodies = bodies :+ b
+      if (size > minimumSize) {
+        val hs = size / 2
+        val qs = hs / 2
+        val emptyFork = Fork(
+          nw = Empty(centerX - qs, centerY - qs, hs),
+          ne = Empty(centerX + qs, centerY - qs, hs),
+          sw = Empty(centerX - qs, centerY + qs, hs),
+          se = Empty(centerX + qs, centerY + qs, hs)
+        )
+        allBodies.foldLeft(emptyFork)(_ insert _)
+      } else Leaf(centerX, centerY, size + 1, allBodies)
+    }
   }
 
   def minimumSize = 0.00001f
