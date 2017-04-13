@@ -95,6 +95,7 @@ package object barneshut {
       bodies.foldLeft(0f)((z, b) => z + b.x * b.mass) / mass: Float,
       bodies.foldLeft(0f)((z, b) => z + b.y * b.mass) / mass: Float)*/
     val mass: Float = bodies.foldLeft(0f)(_ + _.mass)
+    //TODO: Could be simplified to one traverse only for x and y
     val massX: Float = bodies.foldLeft(0f)((z, b) => z + b.x * b.mass) / mass
     val massY: Float = bodies.foldLeft(0f)((z, b) => z + b.y * b.mass) / mass
 
@@ -162,12 +163,17 @@ package object barneshut {
 
       def traverse(quad: Quad): Unit = (quad: Quad) match {
         case Empty(_, _, _) =>
-        // no force
+          // no force
+          (): Unit
         case Leaf(_, _, _, bodies) =>
-        // add force contribution of each body by calling addForce
+          // add force contribution of each body by calling addForce
+          bodies.foreach(b => addForce(b.mass, b.x, b.y))
         case Fork(nw, ne, sw, se) =>
-        // see if node is far enough from the body,
-        // or recursion is needed
+          // see if node is far enough from the body,
+          // or recursion is needed
+          Seq(nw, ne, sw, se).foreach( q =>
+            if (q.size / distance(x, y, q.massX, q.massY) < theta) addForce(q.mass, q.massX, q.massY) else traverse(q)
+          )
       }
 
       traverse(quad)
