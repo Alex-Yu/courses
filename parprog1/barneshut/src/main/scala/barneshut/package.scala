@@ -44,31 +44,52 @@ package object barneshut {
   }
 
   case class Empty(centerX: Float, centerY: Float, size: Float) extends Quad {
-    def massX: Float = ???
-    def massY: Float = ???
-    def mass: Float = ???
-    def total: Int = ???
-    def insert(b: Body): Quad = ???
+    def massX: Float = centerX
+    def massY: Float = centerY
+    def mass: Float = 0
+    def total: Int = 0
+    def insert(b: Body): Quad = Leaf(centerX, centerY, size, Seq(b))
   }
 
   case class Fork(
-    nw: Quad, ne: Quad, sw: Quad, se: Quad
-  ) extends Quad {
-    val centerX: Float = ???
-    val centerY: Float = ???
-    val size: Float = ???
-    val mass: Float = ???
-    val massX: Float = ???
-    val massY: Float = ???
-    val total: Int = ???
+                   nw: Quad, ne: Quad, sw: Quad, se: Quad
+                 ) extends Quad {
+
+    private val isEmpty =
+      Seq(nw, ne, sw, se).foldLeft(true) { (z, q) =>
+        q match {
+          case e: Empty => z
+          case _ => false
+        }
+      }
+
+    val centerX: Float = nw.centerX + nw.size / 2
+    val centerY: Float = nw.centerY + nw.size / 2
+    val size: Float = nw.size * 2
+    val mass: Float = nw.mass + ne.mass + sw. mass + se.mass
+    val massX: Float = if (isEmpty) centerX else nw.mass * nw.massX + ne.mass * ne.massX + sw.mass * sw.massX + se.mass * se.massX
+    val massY: Float = if (isEmpty) centerX else nw.mass * nw.massY + ne.mass * ne.massY + sw.mass * sw.massY + se.mass * se.massY
+    val total: Int = nw.total + ne.total + sw.total + se.total
 
     def insert(b: Body): Fork = {
-      ???
+      //!!! body could belong to multiple quads (rethink)
+      def belongTo(q: Quad) = {
+        val hs = q.size / 2
+        b.x >= q.centerX - hs && b.x <= q.centerX + hs && b.y >= q.centerY - hs && b.y <= q.centerY + hs
+      }
+
+      val quads = Seq(nw, ne, sw, se).map { q =>
+        if (belongTo(q)) q.insert(b) else q
+      }
+
+      quads match {
+        case Seq(nwI, neI, swI, seI) => Fork(nwI, neI, swI, seI)
+      }
     }
   }
 
   case class Leaf(centerX: Float, centerY: Float, size: Float, bodies: Seq[Body])
-  extends Quad {
+    extends Quad {
     val (mass, massX, massY) = (??? : Float, ??? : Float, ??? : Float)
     val total: Int = ???
     def insert(b: Body): Quad = ???
@@ -120,12 +141,12 @@ package object barneshut {
 
       def traverse(quad: Quad): Unit = (quad: Quad) match {
         case Empty(_, _, _) =>
-          // no force
+        // no force
         case Leaf(_, _, _, bodies) =>
-          // add force contribution of each body by calling addForce
+        // add force contribution of each body by calling addForce
         case Fork(nw, ne, sw, se) =>
-          // see if node is far enough from the body,
-          // or recursion is needed
+        // see if node is far enough from the body,
+        // or recursion is needed
       }
 
       traverse(quad)
