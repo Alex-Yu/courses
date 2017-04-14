@@ -90,10 +90,6 @@ package object barneshut {
 
   case class Leaf(centerX: Float, centerY: Float, size: Float, bodies: Seq[Body])
     extends Quad {
-    /*val (mass: Float, massX, massY) = (
-      bodies.foldLeft(0f)(_ + _.mass): Float,
-      bodies.foldLeft(0f)((z, b) => z + b.x * b.mass) / mass: Float,
-      bodies.foldLeft(0f)((z, b) => z + b.y * b.mass) / mass: Float)*/
     val mass: Float = bodies.foldLeft(0f)(_ + _.mass)
     //TODO: Could be simplified to one traverse only for x and y
     val massX: Float = bodies.foldLeft(0f)((z, b) => z + b.x * b.mass) / mass
