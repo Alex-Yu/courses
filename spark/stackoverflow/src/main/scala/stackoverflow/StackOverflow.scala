@@ -21,13 +21,9 @@ object StackOverflow extends StackOverflow {
   def main(args: Array[String]): Unit = {
 
     val lines   = sc.textFile("src/main/resources/stackoverflow/stackoverflow.csv")
-    println("lines=" + lines.count())
     val raw     = rawPostings(lines)
-    println("raw=" + raw.count())
     val grouped = groupedPostings(raw)
-    println("grouped=" + grouped.count())
     val scored  = scoredPostings(grouped)
-    println("scored=" +  scored.count())
     val vectors = vectorPostings(scored)
     assert(vectors.count() == 2121822, "Incorrect number of vectors: " + vectors.count())
 
@@ -188,6 +184,7 @@ class StackOverflow extends Serializable {
   /** Main kmeans computation */
   @tailrec final def kmeans(means: Array[(Int, Int)], vectors: RDD[(Int, Int)], iter: Int = 1, debug: Boolean = false): Array[(Int, Int)] = {
     val newMeans = means.clone() // you need to compute newMeans
+
 
     // TODO: Fill in the newMeans array
     val distance = euclideanDistance(means, newMeans)
