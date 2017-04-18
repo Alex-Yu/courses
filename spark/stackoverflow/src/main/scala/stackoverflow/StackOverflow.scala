@@ -102,7 +102,9 @@ class StackOverflow extends Serializable {
       highScore
     }
 
-    ???
+    grouped.collect {
+      case (_, qas) if qas.nonEmpty => qas.head._1 -> answerHighScore(qas.map(_._2).toArray)
+    }
   }
 
 
