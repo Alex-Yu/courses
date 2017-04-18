@@ -28,8 +28,8 @@ object StackOverflow extends StackOverflow {
     assert(vectors.count() == 2121822, "Incorrect number of vectors: " + vectors.count())
 
     val means   = kmeans(sampleVectors(vectors), vectors, debug = true)
-    val results = clusterResults(means, vectors)
-    printResults(results)
+//    val results = clusterResults(means, vectors)
+//    printResults(results)
   }
 }
 
@@ -183,8 +183,16 @@ class StackOverflow extends Serializable {
 
   /** Main kmeans computation */
   @tailrec final def kmeans(means: Array[(Int, Int)], vectors: RDD[(Int, Int)], iter: Int = 1, debug: Boolean = false): Array[(Int, Int)] = {
-    val newMeans = means.clone() // you need to compute newMeans
 
+    //    val newMeans = means.clone() // you need to compute newMeans
+
+    // return index of means array mapped to sequence of points
+    val classified: RDD[(Int, Iterable[(Int, Int)])] = vectors.groupBy(findClosest(_, means)).persist
+
+    val newMeans = means.indices.map[(Int, Int), Array[(Int, Int)]] { i =>
+      val temp = classified.filter(_._1 == i).map(p => averageVectors(p._2))
+      if (temp.isEmpty()) means(i) else temp.reduce((l, _) => l)
+    } (collection.breakOut)
 
     // TODO: Fill in the newMeans array
     val distance = euclideanDistance(means, newMeans)
@@ -285,8 +293,12 @@ class StackOverflow extends Serializable {
     val closestGrouped = closest.groupByKey()
 
     val median = closestGrouped.mapValues { vs =>
-      val langLabel: String   = ??? // most common language in the cluster
-      val langPercent: Double = ??? // percent of the questions in the most common language
+
+      val langsArr = langs.toArray
+      val langLabel: String   = vs.groupBy(_._1).mapValues(_.size).toArray.sortBy(_._2)(Ordering.Int.reverse)
+          .headOption.map(p => langsArr(p._1)).getOrElse("")
+      // most common language in the cluster
+      val langPercent: Double = ??? // percent of the answers in the most common language
       val clusterSize: Int    = ???
       val medianScore: Int    = ???
 
