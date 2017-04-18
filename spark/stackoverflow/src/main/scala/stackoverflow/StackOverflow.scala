@@ -21,11 +21,15 @@ object StackOverflow extends StackOverflow {
   def main(args: Array[String]): Unit = {
 
     val lines   = sc.textFile("src/main/resources/stackoverflow/stackoverflow.csv")
+    println("lines=" + lines.count())
     val raw     = rawPostings(lines)
+    println("raw=" + raw.count())
     val grouped = groupedPostings(raw)
+    println("grouped=" + grouped.count())
     val scored  = scoredPostings(grouped)
+    println("scored=" +  scored.count())
     val vectors = vectorPostings(scored)
-//    assert(vectors.count() == 2121822, "Incorrect number of vectors: " + vectors.count())
+    assert(vectors.count() == 2121822, "Incorrect number of vectors: " + vectors.count())
 
     val means   = kmeans(sampleVectors(vectors), vectors, debug = true)
     val results = clusterResults(means, vectors)
@@ -78,8 +82,8 @@ class StackOverflow extends Serializable {
 
   /** Group the questions and answers together */
   def groupedPostings(postings: RDD[Posting]): RDD[(Int, Iterable[(Posting, Posting)])] = {
-    val questions = postings.filter(_.postingType == 2).map(post => post.id -> post)
-    val answers = postings.filter(_.postingType == 1).collect {
+    val questions = postings.filter(_.postingType == 1).map(post => post.id -> post)
+    val answers = postings.filter(_.postingType == 2).collect {
       case post if post.parentId.isDefined => post.parentId.get -> post
     }
 
@@ -124,7 +128,11 @@ class StackOverflow extends Serializable {
       }
     }
 
-    ???
+    scored.map { case (post, score) =>
+      firstLangInTag(post.tags, langs).map(_ * langSpread) -> score
+    }.collect {
+      case (optLang, score) if optLang.nonEmpty => optLang.get -> score
+    }
   }
 
 
