@@ -76,7 +76,7 @@ object TimeUsage {
     */
   def row(line: List[String]): Row = {
     require(line.nonEmpty, "Line couldn't be empty")
-    Row(line.head, line.tail.map(_.trim):_*)
+    Row(line.head :: line.tail.map(_.trim):_*)
   }
 
   /** @return The initial data frame columns partitioned in three groups: primary needs (sleeping, eating, etc.),
@@ -95,7 +95,15 @@ object TimeUsage {
     *    “t10”, “t12”, “t13”, “t14”, “t15”, “t16” and “t18” (those which are not part of the previous groups only).
     */
   def classifiedColumns(columnNames: List[String]): (List[Column], List[Column], List[Column]) = {
-    ???
+    columnNames.foldLeft((List.empty[Column], List.empty[Column], List.empty[Column])) {
+      (z, cName) => cName match {
+        case primary if Seq("t01", "t03", "t11", "t1801", "t1803").exists(primary.startsWith) => z.copy(_1 = col(primary) :: z._1)
+        case working if Seq("t05", "t1805").exists(working.startsWith) => z.copy(_2 = col(working) :: z._2)
+        case other if Seq("t02", "t04", "t06", "t07", "t08", "t09",
+          "t10", "t12", "t13", "t14", "t15", "t16", "t18").exists(other.startsWith) => z.copy(_3 = col(other) :: z._3)
+        case _ => z
+      }
+    }
   }
 
   /** @return a projection of the initial DataFrame such that all columns containing hours spent on primary needs

@@ -1,5 +1,8 @@
-val a = List(1, 2)
+val pattern = "(t[0-9]{2,4}).*".r
 
-def to(x: Int*) = x.map(_ + 1)
+val a = "t123dnkdfk"
 
-to(a: _*)
+a match {
+  case pattern("t12") => "+"
+  case _ => "-"
+}
