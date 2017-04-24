@@ -32,6 +32,8 @@ object TimeUsage {
     val summaryDf = timeUsageSummary(primaryNeedsColumns, workColumns, otherColumns, initDf)
     val finalDf = timeUsageGrouped(summaryDf)
     finalDf.show()
+    val plainSqlDf = timeUsageGroupedSql(finalDf)
+    plainSqlDf.show()
   }
 
   /** @return The read DataFrame along with its column names. */
@@ -200,7 +202,11 @@ object TimeUsage {
     * @param viewName Name of the SQL view to use
     */
   def timeUsageGroupedSqlQuery(viewName: String): String =
-    ???
+    "SELECT working, sex, age," +
+      "ROUND(AVG(primaryNeeds), 0) AS primaryNeeds, ROUND(AVG(work), 0) AS work, ROUND(AVG(other), 0) AS other " +
+      s"FROM $viewName " +
+      "GROUP BY working, sex, age " +
+      "ORDER BY working, sex, age"
 
   /**
     * @return A `Dataset[TimeUsageRow]` from the “untyped” `DataFrame`
