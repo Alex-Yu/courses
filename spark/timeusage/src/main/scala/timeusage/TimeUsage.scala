@@ -30,9 +30,8 @@ object TimeUsage {
     val (columns, initDf) = read("/timeusage/atussum.csv")
     val (primaryNeedsColumns, workColumns, otherColumns) = classifiedColumns(columns)
     val summaryDf = timeUsageSummary(primaryNeedsColumns, workColumns, otherColumns, initDf)
-    summaryDf.show()
-//    val finalDf = timeUsageGrouped(summaryDf)
-//    finalDf.show()
+    val finalDf = timeUsageGrouped(summaryDf)
+    finalDf.show()
   }
 
   /** @return The read DataFrame along with its column names. */
@@ -179,9 +178,13 @@ object TimeUsage {
     *
     * Finally, the resulting DataFrame should be sorted by working status, sex and age.
     */
-  def timeUsageGrouped(summed: DataFrame): DataFrame = {
-    ???
-  }
+  def timeUsageGrouped(summed: DataFrame): DataFrame =
+    summed.groupBy("working", "sex", "age")
+      .agg(
+        round(avg("primaryNeeds")).as("primaryNeeds"),
+        round(avg("work")).as("work"),
+        round(avg("other")).as("other")
+      ).sort("working", "sex", "age")
 
   /**
     * @return Same as `timeUsageGrouped`, but using a plain SQL query instead
