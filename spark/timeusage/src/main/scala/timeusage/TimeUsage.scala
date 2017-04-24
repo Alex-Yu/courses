@@ -30,8 +30,9 @@ object TimeUsage {
     val (columns, initDf) = read("/timeusage/atussum.csv")
     val (primaryNeedsColumns, workColumns, otherColumns) = classifiedColumns(columns)
     val summaryDf = timeUsageSummary(primaryNeedsColumns, workColumns, otherColumns, initDf)
-    val finalDf = timeUsageGrouped(summaryDf)
-    finalDf.show()
+    summaryDf.show()
+//    val finalDf = timeUsageGrouped(summaryDf)
+//    finalDf.show()
   }
 
   /** @return The read DataFrame along with its column names. */
@@ -76,7 +77,7 @@ object TimeUsage {
     */
   def row(line: List[String]): Row = {
     require(line.nonEmpty, "Line couldn't be empty")
-    Row(line.head :: line.tail.map(_.trim):_*)
+    Row(line.head :: line.tail.map(_.trim.toDouble):_*)
   }
 
   /** @return The initial data frame columns partitioned in three groups: primary needs (sleeping, eating, etc.),
@@ -94,9 +95,9 @@ object TimeUsage {
     * 3. other activities (leisure). These are the columns starting with “t02”, “t04”, “t06”, “t07”, “t08”, “t09”,
     *    “t10”, “t12”, “t13”, “t14”, “t15”, “t16” and “t18” (those which are not part of the previous groups only).
     */
-  def classifiedColumns(columnNames: List[String]): (List[Column], List[Column], List[Column]) = {
-    columnNames.foldLeft((List.empty[Column], List.empty[Column], List.empty[Column])) {
-      (z, cName) => cName match {
+  def classifiedColumns(columnNames: List[String]): (List[Column], List[Column], List[Column]) =
+    columnNames.foldLeft((List.empty[Column], List.empty[Column], List.empty[Column])) { (z, cName) =>
+      cName match {
         case primary if Seq("t01", "t03", "t11", "t1801", "t1803").exists(primary.startsWith) => z.copy(_1 = col(primary) :: z._1)
         case working if Seq("t05", "t1805").exists(working.startsWith) => z.copy(_2 = col(working) :: z._2)
         case other if Seq("t02", "t04", "t06", "t07", "t08", "t09",
@@ -104,7 +105,7 @@ object TimeUsage {
         case _ => z
       }
     }
-  }
+
 
   /** @return a projection of the initial DataFrame such that all columns containing hours spent on primary needs
     *         are summed together in a single column (and same for work and leisure). The “teage” column is also
@@ -137,18 +138,25 @@ object TimeUsage {
     * Note that the initial DataFrame contains time in ''minutes''. You have to convert it into ''hours''.
     */
   def timeUsageSummary(
-    primaryNeedsColumns: List[Column],
-    workColumns: List[Column],
-    otherColumns: List[Column],
-    df: DataFrame
-  ): DataFrame = {
-    val workingStatusProjection: Column = ???
-    val sexProjection: Column = ???
-    val ageProjection: Column = ???
-
-    val primaryNeedsProjection: Column = ???
-    val workProjection: Column = ???
-    val otherProjection: Column = ???
+                        primaryNeedsColumns: List[Column],
+                        workColumns: List[Column],
+                        otherColumns: List[Column],
+                        df: DataFrame
+                      ): DataFrame = {
+    val workingStatusProjection: Column = when(
+      df("telfs") >= 1 && df("telfs") < 3, "working"
+    ).otherwise("not working").as("working")
+    val sexProjection: Column = when(
+      df("tesex") === 1, "male"
+    ).otherwise("female").as("sex")
+    val ageProjection: Column = when(
+      df("teage") >= 15 && df("teage") <= 22, "young"
+    ).when(
+      df("teage") >= 23 && df("teage") <= 55, "active"
+    ).otherwise("elder").as("age")
+    val primaryNeedsProjection: Column = (primaryNeedsColumns.reduce(_ + _) / 60).as("primaryNeeds")
+    val workProjection: Column = (workColumns.reduce(_ + _) / 60).as("work")
+    val otherProjection: Column = (otherColumns.reduce(_ + _) / 60).as("other")
     df
       .select(workingStatusProjection, sexProjection, ageProjection, primaryNeedsProjection, workProjection, otherProjection)
       .where($"telfs" <= 4) // Discard people who are not in labor force
@@ -228,10 +236,10 @@ object TimeUsage {
   * @param other Number of daily hours spent on other activities
   */
 case class TimeUsageRow(
-  working: String,
-  sex: String,
-  age: String,
-  primaryNeeds: Double,
-  work: Double,
-  other: Double
-)
+                         working: String,
+                         sex: String,
+                         age: String,
+                         primaryNeeds: Double,
+                         work: Double,
+                         other: Double
+                       )
