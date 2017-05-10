@@ -38,7 +38,7 @@ object Extraction {
     val stationsDf: DataFrame = spark.sparkContext.textFile(fsPath(stationsFile))
       .map(_.split(","))
       .collect {
-        case attr if attr.length >= 4 && attr.forall(_.nonEmpty) => Station(attr(0), attr(1), attr(2).trim.toDouble, attr(3).trim.toDouble)
+        case attr if attr.length >= 4 && attr.slice(2, 4).forall(_.nonEmpty) => Station(attr(0), attr(1), attr(2).trim.toDouble, attr(3).trim.toDouble)
       }.toDF()
 
     stationsDf.createOrReplaceTempView("stations")
@@ -46,7 +46,7 @@ object Extraction {
     val tempByDayDF = spark.sparkContext.textFile(fsPath(temperaturesFile))
       .map(_.split(","))
       .collect {
-        case attr if attr.length >= 5 && attr.forall(_.nonEmpty) && attr(4).trim != "9999.9" =>
+        case attr if attr.length >= 5 && attr.slice(2, 5).forall(_.nonEmpty) && attr(4).trim != "9999.9" =>
           TempByDay(attr(0), attr(1), attr(2).trim.toInt, attr(3).trim.toInt, toCelsius(attr(4).trim.toDouble))
       }.toDF()
 
@@ -68,7 +68,10 @@ object Extraction {
     * @return A sequence containing, for each location, the average temperature over the year.
     */
   def locationYearlyAverageRecords(records: Iterable[(LocalDate, Location, Double)]): Iterable[(Location, Double)] = {
-    ???
+    records.par.groupBy(_._2)
+      .mapValues { iter =>
+        iter.aggregate(0d)((z, triple) => z + triple._3, _ + _) / iter.size
+      }.seq
   }
 
 }
