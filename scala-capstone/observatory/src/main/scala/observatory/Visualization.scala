@@ -44,7 +44,25 @@ object Visualization {
     * @return The color that corresponds to `value`, according to the color scale defined by `points`
     */
   def interpolateColor(points: Iterable[(Double, Color)], value: Double): Color = {
-    ???
+    val interval = points.foldLeft(((Double.MinValue, Color.black), (Double.MaxValue, Color.white))) {
+      case(((l, cl), (r, cr)), (t, c)) =>
+        if (t == value) ((t, c), (t, c))
+        else if (t < value && t > l) ((t, c), (r, cr))
+        else if (t > value && t < r) ((l, cl), (t, c))
+        else ((l, cl), (r, cr))
+    }
+
+    val ((l, cl), (r, cr)) = interval
+    if (l == r && cl == cr) cl
+    else if (l == Double.MinValue) cl
+    else if (r == Double.MaxValue) cr
+    else {
+      val clv = cl.toInt
+      val crv = cr.toInt
+      Color.fromInt(
+        (clv + (value - l) * (crv - clv) / (r - l)).toInt
+      )
+    }
   }
 
   /**
