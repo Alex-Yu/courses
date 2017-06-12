@@ -1,5 +1,5 @@
 package observatory
-
+import Math._
 import com.sksamuel.scrimage.{Image, Pixel}
 
 /**
@@ -13,7 +13,29 @@ object Visualization {
     * @return The predicted temperature at `location`
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
-    ???
+    require(temperatures.nonEmpty, "Temperatures collection couldn't be empty")
+    def distance(l1: Location, l2: Location): Double =
+      6371 * acos(sin(l1.lat) * sin(l2.lat) + cos(l1.lat) * cos(l2.lat) * cos(abs(l1.lon - l2.lon)))
+    def omega(d: Double, p: Double): Double = 1 / pow(d, p)
+
+    val tempByDist = temperatures.par.map { case (l, t) =>
+      (distance(l, location), t)
+    }
+
+    val minD = tempByDist.minBy(_._1) //Could be optimized by aggregating minimum
+    if (minD._1 <= 1) minD._2 else {
+      val p = 2
+      val (numerator, denominator) = tempByDist.aggregate((0d, 0d))(
+        (z, dt) => {
+          val (numerator, denominator) = z
+          val (d, t) = dt
+          val omegaI = omega(d, p)
+          (numerator + omegaI * t, denominator + omegaI)
+        },
+        (l, r) => (l._1 + r._1, l._2 + r._2)
+      )
+      numerator / denominator
+    }
   }
 
   /**
