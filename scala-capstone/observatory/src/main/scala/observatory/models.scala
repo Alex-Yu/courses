@@ -1,6 +1,5 @@
 package observatory
 
-import java.awt.{Color => javaColor}
 
 case class Location(lat: Double, lon: Double)
 

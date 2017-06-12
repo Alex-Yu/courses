@@ -1,6 +1,7 @@
 package observatory
-import Math._
-import com.sksamuel.scrimage.{Image, Pixel}
+import java.lang.Math._
+
+import com.sksamuel.scrimage.{Image, Pixel, Color => SkColor}
 
 /**
   * 2nd milestone: basic visualization
@@ -71,7 +72,15 @@ object Visualization {
     * @return A 360×180 image where each pixel shows the predicted temperature at its location
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
-    ???
+    def toIdx(location: Location): Int = (360 * (90 - location.lat.round) + (180 + location.lon.round)).toInt
+    def toPixel(c: Color) = Pixel(c.red, c.green, c.blue, 0)
+    val tempDict = temperatures.par.map{ case(l, t) => toIdx(l) -> t }.toMap
+    val pixels: Array[Pixel] = (0 until 360 * 180).toParArray.map(idx =>
+      tempDict.get(idx).map(temp =>
+        toPixel(interpolateColor(colors, temp))
+      ).getOrElse(Pixel(SkColor.Black))
+    ).toArray
+    Image(360, 180, pixels)
   }
 
 }
